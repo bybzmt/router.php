@@ -205,7 +205,7 @@ class Router extends Basic {
                 throw new Exception("Dispatch '$func' Method Not Exists");
             }
 
-            return call_user_func_array(array($obj, $method), $params);
+            return $obj->$method();
         }
 
         if (is_callable($func)) {

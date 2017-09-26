@@ -8,6 +8,12 @@ namespace Bybzmt\Router;
  */
 class Reverse
 {
+    //匹配时正则开头
+    protected $_regex_left = '#^';
+    //匹配时正则结尾
+    protected $_regex_right = '$#';
+
+    //反向路由数据
     protected $_map;
 
     function __construct(array $map=[]) {
@@ -60,37 +66,31 @@ class Reverse
         throw new Exception("mkUrl 映射:$action 与所有规则都不匹配");
     }
 
-    protected function _build(array $route, array $params, bool $must)
+    protected function _build(array $route, array $params, bool $throwErr)
     {
-        $verification = '#^'.$route[0].'$#';
+        $verification = $this->_regex_left . $route[0] . $this->_regex_right;
         $format = $route[1];
         $keys = $route[2];
 
+        //无参数的就是静态映射不需要验证
         if (count($keys) == 0) {
             return [$route[0], $params];
         }
 
         $param_arr = [$format];
 
-        foreach ($keys as $key) {
-            $prefix = '';
-            $optional  = false;
-
-            //可选参数
-            if ($key[0] == ':') {
-                $optional  = true;
-                list(,$prefix, $key) = explode(':', $key, 3);
-            }
+        foreach ($keys as $tmp) {
+            list($must, $prefix, $key) = $tmp;
 
             if (isset($params[$key])) {
-                $param_arr[] = $params[$key];
+                $param_arr[] = $prefix . $params[$key];
                 unset($params[$key]);
             } else {
-                if ($optional) {
+                if (!$must) {
                     $param_arr[] = "";
                 } else {
                     //缺少必选参数
-                    if ($must) {
+                    if ($throwErr) {
                         throw new Exception("生成链接 缺少参数:$key");
                     } else {
                         return null;
@@ -106,7 +106,7 @@ class Reverse
             return [$uri, $params];
         }
 
-        if ($must) {
+        if ($throwErr) {
             throw new Exception("生成的Uri:$uri 不符合正则:$verification 要求");
         } else {
             return null;

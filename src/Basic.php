@@ -6,6 +6,12 @@ namespace Bybzmt\Router;
  */
 class Basic
 {
+    //匹配时正则开头
+    protected $_regex_left = '#^';
+    //匹配时正则结尾
+    protected $_regex_right = '$#';
+
+    //路由规则数据
     protected $_routes;
 
     /**
@@ -49,7 +55,7 @@ class Basic
 
         if (isset($routes['#regex#'])) {
             foreach ($routes['#regex#'] as $pattern => $func) {
-                if (preg_match('#^' . $pattern . '$#', $tail, $matches,  PREG_OFFSET_CAPTURE)) {
+                if (preg_match($this->_regex_left . $pattern . $this->_regex_right, $tail, $matches,  PREG_OFFSET_CAPTURE)) {
 
                     $params = [];
                     for ($i=1, $e=count($matches); $i<$e; $i++) {

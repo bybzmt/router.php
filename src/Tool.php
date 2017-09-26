@@ -104,9 +104,10 @@ class Tool
                         $tips = [];
                         for ($i=3, $m=count($tmp); $i<$m; $i++) {
                             if (strpos($tmp[$i], ' ') != false) {
-                                $tips[] = ':'.implode(':', explode(' ', $tmp[$i], 2));
+                                list($prefix, $kname) = explode(' ', $tmp[$i], 2);
+                                $tips[] = [false, $prefix, $kname];
                             } else {
-                                $tips[] = $tmp[$i];
+                                $tips[] = [true, "", $tmp[$i]];
                             }
                         }
 
