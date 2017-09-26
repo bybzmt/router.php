@@ -57,9 +57,9 @@ class Basic
                             //将多个子组重复捕捉到的部分去除
                             //如：/blog(/\d+(/\d+(/\d+)?)?)?
                             //匹配：/blog/2017/9/23 得到 2017、9、23
-                            $params[] = trim(substr($matches[$i][0], 0, $matches[$i+1][1] - $matches[$i][1]), '/');
+                            $params[] = substr($matches[$i][0], 0, $matches[$i+1][1] - $matches[$i][1]);
                         } else {
-                            $params[] = trim($matches[$i][0], '/');
+                            $params[] = $matches[$i][0];
                         }
                     }
 

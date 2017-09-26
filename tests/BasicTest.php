@@ -89,7 +89,7 @@ class BasicTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($re, [$this->content, []]);
 
         $re = $router->match('GET', '/hello/bramus');
-        $this->assertEquals($re, [$this->content, ['bramus']]);
+        $this->assertEquals($re, [$this->content, ['/bramus']]);
     }
 
     public function testDynamicRouteWithMultipleSubpatterns()
@@ -112,16 +112,16 @@ class BasicTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($re, [$this->content, []]);
 
         $re = $router->match('GET', '/blog/1983');
-        $this->assertEquals($re, [$this->content, ['1983']]);
+        $this->assertEquals($re, [$this->content, ['/1983']]);
 
         $re = $router->match('GET', '/blog/1983/12');
-        $this->assertEquals($re, [$this->content, ['1983', '12']]);
+        $this->assertEquals($re, [$this->content, ['/1983', '/12']]);
 
         $re = $router->match('GET', '/blog/1983/12/26');
-        $this->assertEquals($re, [$this->content, ['1983', '12', '26']]);
+        $this->assertEquals($re, [$this->content, ['/1983', '/12', '/26']]);
 
         $re = $router->match('GET', '/blog/1983/12/26/bramus');
-        $this->assertEquals($re, [$this->content, ['1983', '12', '26', 'bramus']]);
+        $this->assertEquals($re, [$this->content, ['/1983', '/12', '/26', '/bramus']]);
     }
 
     public function testDynamicRouteWithNestedOptionalSubpatterns()
@@ -132,10 +132,10 @@ class BasicTest extends PHPUnit_Framework_TestCase
         $router->handle('GET', '/hello(/\w+(/\w+)?)?', $this->content);
 
         $re = $router->match('GET', '/hello/bramus');
-        $this->assertEquals($re, [$this->content, ['bramus']]);
+        $this->assertEquals($re, [$this->content, ['/bramus']]);
 
         $re = $router->match('GET', '/hello/bramus/bramus');
-        $this->assertEquals($re, [$this->content, ['bramus', 'bramus']]);
+        $this->assertEquals($re, [$this->content, ['/bramus', '/bramus']]);
     }
 
     public function testDynamicRouteWithWildcard()

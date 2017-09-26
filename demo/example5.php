@@ -20,6 +20,8 @@ $router->get('/bb/a2', null);
 $router->get('/bb/a3', 1);
 $router->get('/bb/a4', false);
 $router->get('/dd/aa', ':example:test');
+$router->get('/dd/aa/(\d{4}(\d{2}(/\d{2})?)?)?\.php', ':example:test');
+$router->get('/dd/aa/(\d{4}(-\d{2}(-\d{2})?)?)?\.php', ':example:test');
 $router->get('/dd/aa/(\d+)', ':example:test');
 $router->get('/dd/(\d+)', ':example:test');
 $router->get('/cc', function(){
@@ -43,11 +45,13 @@ $tmpfile = tempnam(sys_get_temp_dir(), 'test_');
 //当你这样使用时，tmpfile一般是要加入版本管理的
 //而这个生成文件要单独写一个文件，每次修改这个
 //文件后重新运行一次
-$router->saveCache($tmpfile);
+$tool = new \Bybzmt\Router\Tool($router->getRoutes());
+$code = $tool->exportRoutes();
+
+file_put_contents($tmpfile, $code);
 
 echo "------------ 生成的代码开始 ----------\n";
-//echo $router->saveCache();
-echo file_get_contents($tmpfile);
+echo $code;
 echo "------------ 生成的代码结速 ----------\n";
 
 #----- 正式程序将这么写 ----------

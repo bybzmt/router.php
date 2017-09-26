@@ -10,3 +10,5 @@
 require __DIR__ . '/../src/Exception.php';
 require __DIR__ . '/../src/Basic.php';
 require __DIR__ . '/../src/Router.php';
+require __DIR__ . '/../src/Tool.php';
+require __DIR__ . '/../src/Reverse.php';
