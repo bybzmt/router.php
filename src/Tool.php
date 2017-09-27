@@ -63,14 +63,14 @@ class Tool
     {
         $map = array();
 
-        foreach ($this->_routes as $method => $route) {
+        foreach ($this->_routes as $route) {
             if (isset($route['#map#'])) {
                 foreach ($route['#map#'] as $uri => $func) {
                     if (is_string($func) && $func[0] === $this->_func_separator) {
                         list(, $p1, $p2) = explode($this->_func_separator, $func);
                         $action = ltrim($p1, '\\') . $this->_func_separator . $p2;
 
-                        $map[$action][$method][] = [$uri, $uri, []];
+                        $map[$action][] = [null, $uri, []];
                     } else {
                         //忽略掉其它格式的
                     }
@@ -79,33 +79,44 @@ class Tool
                 unset($route['#map#']);
             }
 
-            $this->_convertRegex($map, $route, $method, []);
+            $this->_convertRegex($map, $route, []);
         }
 
         //排下序尽量把要求最严的放在最前面
-        foreach ($map as $func => $methods) {
-            foreach ($methods as $method => $datas) {
+        foreach ($map as $func => $datas) {
+            usort($datas, function($aa, $bb){
+                $a = count($aa[2]);
+                $b = count($bb[2]);
+                if ($a==$b) {
+                    $a = strlen($aa[0]);
+                    $b = strlen($bb[0]);
+                }
 
-                usort($datas, function($aa, $bb){
-                    $a = count($aa[2]);
-                    $b = count($bb[2]);
-                    if ($a==$b) {
-                        $a = strlen($aa[0]);
-                        $b = strlen($bb[0]);
-                    }
+                return ($a==$b) ? 0 : ($a<$b) ? 1 : -1;
+            });
 
-                    return ($a==$b) ? 0 : ($a<$b) ? 1 : -1;
-                });
+            //去掉重复的规则
+            $hashs = [];
+            $new_data = [];
+            foreach ($datas as $tmp) {
+                $hash = md5($this->_export($tmp));
 
-                $map[$func][$method] = $datas;
+                if (isset($hashs[$hash])) {
+                    continue;
+                }
+
+                $hashs[$hash] = 1;
+                $new_data[] = $tmp;
             }
+
+            $map[$func] = $new_data;
         }
 
         return $map;
     }
 
     //转换正则规则的路由
-    protected function _convertRegex(array &$map, array $root, string $method, array $stack)
+    protected function _convertRegex(array &$map, array $root, array $stack)
     {
         foreach ($root as $key => $routes) {
             if ($key == '#regex#') {
@@ -142,13 +153,13 @@ class Tool
 
                         $full_regex = $this->_regex_left . $full_regex . $this->_regex_right;
 
-                        $map[$func][$method][] = [$full_regex, $format, $tips];
+                        $map[$func][] = [$full_regex, $format, $tips];
                     } else {
                         //忽略掉其它格式的
                     }
                 }
             } else {
-                $this->_convertRegex($map, $routes, $method, array_merge($stack, [$key]));
+                $this->_convertRegex($map, $routes, array_merge($stack, [$key]));
             }
         }
     }
