@@ -19,15 +19,9 @@ $router = new \Bybzmt\Router\Router();
  *
  * 映射应该与路由中捕获的参数数量一至，它会将参数映射到$_GET数组中去
  *
- * 如访问连接为: /aa/bb/cc 那么下面设置会访问到
- * 类名: example 方法名: test 参数: $_GET['a'] = 'bb'; $_GET['b'] = 'cc';
- * 注意！类名需要有命名空间并以\开头
- *
- * 另外回调参数也可以设为一个回调函数
- * 可参考 example2.php
- *
- * 如果认为这种路由映射不满足需求,只要继承Router类并重写掉dispatch()方即可
- * 可参考 example3.php
+ * 如访问链接为: /aa/bb/cc 那么下面设置会访问到
+ * 类: Example\Example 方法: test 参数: $_GET['a'] = 'bb'; $_GET['b'] = 'cc';
+ * 注意！类名需要包含命名空间
  */
 $router->get('/aa/(\w+)/(\w+)', ':Example\Example:test:a:b');
 

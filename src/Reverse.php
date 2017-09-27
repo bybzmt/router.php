@@ -8,22 +8,28 @@ namespace Bybzmt\Router;
  */
 class Reverse
 {
-    //匹配时正则开头
-    protected $_regex_left = '#^';
-    //匹配时正则结尾
-    protected $_regex_right = '$#';
-
     //反向路由数据
     protected $_map;
 
-    function __construct(array $map=[]) {
+    /**
+     * 初始化反向路由
+     *
+     * @param map 用于载入之前缓存的反向路由规则
+     */
+    function __construct(array $map=[])
+    {
         $this->_map = $map;
     }
 
     /**
      * 创建链接地址
      *
-     * @param action 命名空间\函数:方法
+     * 目标对像: 请求方法 + 空格 + 类名:类方法
+     * 一般情况下请求方法可省略
+     * 仅在将同一个"类名:类方法"注册到多个不同方法中时需要
+     *
+     * @param action 目标对像
+     * @param params 请求参数
      */
     function buildUri(string $action, array $params=[])
     {
@@ -34,7 +40,7 @@ class Reverse
             list($method, $func) = explode(" ", $action, 2);
         }
 
-        $func = '\\'.ltrim($func, '\\');
+        $func = ltrim($func, '\\ ');
 
         if (!isset($this->_map[$func])) {
             throw new Exception("mkUrl 映射关系:$action 未定义");
@@ -68,18 +74,14 @@ class Reverse
 
     protected function _build(array $route, array $params, bool $throwErr)
     {
-        $verification = $this->_regex_left . $route[0] . $this->_regex_right;
-        $format = $route[1];
-        $keys = $route[2];
-
         //无参数的就是静态映射不需要验证
-        if (count($keys) == 0) {
-            return [$route[0], $params];
+        if (count($route[2]) == 0) {
+            return [$route[1], $route[2]];
         }
 
-        $param_arr = [$format];
+        $param_arr = [$route[1]];
 
-        foreach ($keys as $tmp) {
+        foreach ($route[2] as $tmp) {
             list($must, $prefix, $key) = $tmp;
 
             if (isset($params[$key])) {
@@ -102,12 +104,12 @@ class Reverse
         $uri = call_user_func_array('sprintf', $param_arr);
 
         //验证是否符合正则要求
-        if (preg_match($verification, $uri)) {
+        if (preg_match($route[0], $uri)) {
             return [$uri, $params];
         }
 
         if ($throwErr) {
-            throw new Exception("生成的Uri:$uri 不符合正则:$verification 要求");
+            throw new Exception("生成的Uri:$uri 不符合正则:{$route[0]} 要求");
         } else {
             return null;
         }

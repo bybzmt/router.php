@@ -1,33 +1,68 @@
 <?php
 namespace Bybzmt\Router;
 
-class Router extends Basic {
-    private $_basePath;
-    private $_uri;
+/**
+ * 路由器
+ */
+class Router extends Basic
+{
+
+    //回调函数分隔符
+    protected $_func_separator = ':';
+
+    //key映射前缀分隔符
+    protected $_key_prefix_separator = ' ';
+
+    //请求方法 如:GET
     private $_method;
+
+    //请求base路径
+    private $_basePath;
+
+    //请求地址
+    private $_uri;
+
+    //404错误回调
     private $_notFoundFunc;
 
-    public function set404($func) {
+    /**
+     * 设置404错误回调
+     */
+    public function set404($func)
+    {
         $this->_notFoundFunc = $func;
         return $this;
     }
 
-    public function setBasePath(string $base) {
-        $this->_basePath = $base;
-        return $this;
-    }
-
-    public function setUri(string $uri) {
-        $this->_uri = $uri;
-        return $this;
-    }
-
+    /**
+     * 设置很求方法 如: GET
+     */
     public function setMethod(string $method)
     {
         $this->_method = $method;
         return $this;
     }
 
+    /**
+     * 设置基础路径 (忽略请求前缀用)
+     */
+    public function setBasePath(string $base)
+    {
+        $this->_basePath = $base;
+        return $this;
+    }
+
+    /**
+     * 设置请求路径
+     */
+    public function setUri(string $uri) {
+        $this->_uri = $uri;
+        return $this;
+    }
+
+    /**
+     * 运行路由
+     */
     public function run()
     {
         $method = $this->getMethod();
@@ -57,48 +92,72 @@ class Router extends Basic {
         return $out;
     }
 
+    /**
+     * 路由注册 充行所有方法访问
+     */
     public function all(string $pattern, $func)
     {
         $this->handle("GET|POST|PUT|PATCH|DELETE|OPTIONS", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 路由注册 充许GET方法访问
+     */
     public function get(string $pattern, $func)
     {
         $this->handle("GET", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 路由注册 充许POST方法访问
+     */
     public function post(string $pattern, $func)
     {
         $this->handle("POST", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 路由注册 充许PUT方法访问
+     */
     public function put(string $pattern, $func)
     {
         $this->handle("PUT", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 路由注册 充许PATCH方法访问
+     */
     public function patch(string $pattern, $func)
     {
         $this->handle("PATCH", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 路由注册 充许DELETE方法访问
+     */
     public function delete(string $pattern, $func)
     {
         $this->handle("DELETE", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 路由注册 充许OPTIONS方法访问
+     */
     public function options(string $pattern, $func)
     {
         $this->handle("OPTIONS", $pattern, $func);
         return $this;
     }
 
+    /**
+     * 得到当前请求方法
+     */
     public function getMethod()
     {
         if ($this->_method === null) {
@@ -122,6 +181,9 @@ class Router extends Basic {
         return $this->_method;
     }
 
+    /**
+     * 得到当前请求路径
+     */
     public function getUri()
     {
         if ($this->_uri === null) {
@@ -137,6 +199,9 @@ class Router extends Basic {
         return $this->_uri;
     }
 
+    /**
+     * 得到当前基础路径
+     */
     public function getBasePath()
     {
         // Check if server base path is defined, if not define it.
@@ -156,21 +221,21 @@ class Router extends Basic {
      */
     protected function default404()
     {
-        if (!isset($_SERVER['SERVER_PROTOCOL'])) {
-            $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.0';
+        if (PHP_SAPI != 'cli') {
+            header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
         }
 
-        header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
-        echo "404 page not found";
+        echo "404 page not found.";
         return false;
     }
 
     /**
      * 默认分发方法
      */
-    protected function dispatch($func, array $params) {
-        if (is_string($func) && $func[0] === ':') {
-            $keys = explode(':', $func);
+    protected function dispatch($func, array $params)
+    {
+        if (is_string($func) && $func[0] === $this->_func_separator) {
+            $keys = explode($this->_func_separator, $func);
 
             if (count($keys) < 3) {
                 throw new Exception("Dispatch '$func' Format Error");
@@ -186,8 +251,8 @@ class Router extends Basic {
 
                     //key可以为"prefix keyname"的形式
                     //这里要把prefix给去除掉
-                    if (strpos($key, ' ') !== false) {
-                        list($prefix, $key) = explode(' ', $key, 2);
+                    if (strpos($key, $this->_key_prefix_separator) !== false) {
+                        list($prefix, $key) = explode($this->_key_prefix_separator, $key, 2);
                         $_GET[$key] = substr($param, strlen($prefix));
                     } else {
                         $_GET[$key] = $param;

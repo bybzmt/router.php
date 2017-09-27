@@ -8,6 +8,7 @@ class Basic
 {
     //匹配时正则开头
     protected $_regex_left = '#^';
+
     //匹配时正则结尾
     protected $_regex_right = '$#';
 
@@ -16,9 +17,11 @@ class Basic
 
     /**
      * 路由初史化
-     * (可以将之前缓存的路由规则直接载入)
+     *
+     * @param routes 用于载入之前缓存的路由规则
      */
-    public function __construct(array $routes=[]) {
+    public function __construct(array $routes=[])
+    {
         $this->_routes = $routes;
     }
 
@@ -29,7 +32,8 @@ class Basic
      * @param uri 请求路径
      * @return 成功反回 array(func, params) 失败反回null
      */
-    public function match(string $method, string $uri) {
+    public function match(string $method, string $uri)
+    {
         $uri = '/'.trim($uri, '/');
 
         $routes = isset($this->_routes[$method]) ? $this->_routes[$method] : array();
@@ -84,10 +88,11 @@ class Basic
      * @param pattern 匹配规则，可以使用PCRE正则
      * @param func    注册的回调，路由匹配成功时它将原样返回
      */
-    public function handle(string $methods, string $pattern, $func) {
+    public function handle(string $methods, string $pattern, $func)
+    {
         $pattern = '/'.trim($pattern, '/');
 
-        $regex_meta_character = '.[](){}*+?\\';
+        $regex_meta_character = '[](){}*+?\\';
 
         //判断是否是正则
         $sub = strpbrk($pattern, $regex_meta_character);
@@ -111,6 +116,10 @@ class Basic
         }
     }
 
+    /**
+     * 导出己注册的路由规则
+     * 用于缓存或调试
+     */
     public function getRoutes()
     {
         return $this->_routes;

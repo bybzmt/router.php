@@ -135,7 +135,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
             echo 'home';
         });
 
-        $this->expectOutputString('404 page not found');
+        $this->expectOutputString('404 page not found.');
         $router->run();
     }
 
