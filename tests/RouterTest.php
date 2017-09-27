@@ -4,15 +4,6 @@ class RouterTest extends PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        $_SERVER['SCRIPT_NAME'] = '/index.php';
-
-        // Default request method to GET
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-
-        $_SERVER['REQUEST_URI'] = '/';
-
-        // Default SERVER_PROTOCOL method to HTTP/1.1
-        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
     }
 
     protected function tearDown()
@@ -123,9 +114,6 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('all', $router->run());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testDefault404()
     {
         $_SERVER['REQUEST_URI'] = '/foo';
@@ -135,7 +123,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
             echo 'home';
         });
 
-        $this->expectOutputString('404 page not found.');
+        $this->expectOutputString('404 Page Not Found.');
         $router->run();
     }
 

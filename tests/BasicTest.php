@@ -36,16 +36,16 @@ class BasicTest extends PHPUnit_Framework_TestCase
         $re = $router->match('GET', '/about');
         $this->assertEquals($re, [$this->content, []]);
 
-        $router->handle('GET', '/about/', $this->content);
-        $re = $router->match('GET', '/about/');
+        $router->handle('GET', '/about1/', $this->content);
+        $re = $router->match('GET', '/about1/');
         $this->assertEquals($re, [$this->content, []]);
 
-        $router->handle('GET', '/about/', $this->content);
-        $re = $router->match('GET', '/about');
+        $router->handle('GET', '/about3/', $this->content);
+        $re = $router->match('GET', '/about3');
         $this->assertEquals($re, [$this->content, []]);
 
-        $router->handle('GET', '/about', $this->content);
-        $re = $router->match('GET', '/about/');
+        $router->handle('GET', '/about4', $this->content);
+        $re = $router->match('GET', '/about4/');
         $this->assertEquals($re, [$this->content, []]);
     }
 
@@ -126,7 +126,6 @@ class BasicTest extends PHPUnit_Framework_TestCase
 
     public function testDynamicRouteWithNestedOptionalSubpatterns()
     {
-        // Create Router
         $router = new \Bybzmt\Router\Basic();
 
         $router->handle('GET', '/hello(/\w+(/\w+)?)?', $this->content);

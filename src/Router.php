@@ -204,15 +204,6 @@ class Router extends Basic
      */
     public function getBasePath()
     {
-        // Check if server base path is defined, if not define it.
-        if (null === $this->_basePath) {
-            if (!isset($_SERVER['SCRIPT_NAME'])) {
-                $_SERVER['SCRIPT_NAME'] = '/';
-            }
-
-            $this->_basePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1));
-        }
-
         return $this->_basePath;
     }
 
@@ -225,7 +216,7 @@ class Router extends Basic
             header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
         }
 
-        echo "404 page not found.";
+        echo "404 Page Not Found.";
         return false;
     }
 

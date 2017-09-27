@@ -130,9 +130,6 @@ class Tool
                         //拆解hold字符串
                         $tmp = explode($this->_func_separator, $hold);
 
-                        //回调函数名
-                        $func = ltrim($tmp[1], '\\') . $this->_func_separator . $tmp[2];
-
                         //找出可选参数
                         $tips = [];
                         for ($i=3, $m=count($tmp); $i<$m; $i++) {
@@ -150,6 +147,9 @@ class Tool
                         if (count($tmp) < 4 || (count($tmp)-3) != $sub_num) {
                             throw new Exception("您注册的路由:'$full_regex' 与回调:'$hold' 不相符");
                         }
+
+                        //回调函数名
+                        $func = ltrim($tmp[1], '\\') . $this->_func_separator . $tmp[2];
 
                         $full_regex = $this->_regex_left . $full_regex . $this->_regex_right;
 

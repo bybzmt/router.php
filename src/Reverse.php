@@ -43,7 +43,6 @@ class Reverse
         //循环所有规则直到有一个符合的为止
         foreach ($routes as $route) {
             if (list($uri, $params_new) = $this->_build($route, $params, $onlyOne)) {
-                //var_dump($uri, $params, $params_new);
                 if ($params_new) {
                     $uri .= '?' . http_build_query($params_new);
                 }
@@ -51,7 +50,7 @@ class Reverse
             }
         }
 
-        throw new Exception("mkUrl 映射:$action 与所有规则都不匹配");
+        throw new Exception("mkUrl 映射:$func 与所有规则都不匹配");
     }
 
     protected function _build(array $route, array $params, bool $onlyOne)
@@ -84,11 +83,6 @@ class Reverse
         }
 
         $uri = call_user_func_array('sprintf', $param_arr);
-
-        //只有一条出于性能考虑不验证了
-        if ($onlyOne) {
-            return [$uri, $params];
-        }
 
         //验证是否符合正则要求
         if (preg_match($route[0], $uri)) {
