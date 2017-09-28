@@ -1,6 +1,6 @@
 Bybzmt/Router
 ==============
-一个精简快速的路由
+A simple and fast PHP Router
 
 Features
 -----------
