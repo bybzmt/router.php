@@ -39,7 +39,9 @@ $code = $tool->exportRoutes();
 file_put_contents($tmpfile, $code);
 
 //缓存的代码可以从这儿看
-//var_dump($code);
+echo "------------ 路由缓存开始 ----------\n";
+var_dump($code);
+echo "------------ 路由缓存结束 ----------\n";
 
 #----- 正式程序将这么写 ----------
 //直接读取之前保存的数据
@@ -56,7 +58,9 @@ $code = $tool->exportReverse();
 file_put_contents($tmpfile, $code);
 
 //缓存的代码可以从这儿看
-//var_dump($code);
+echo "------------ 反向路由缓存开始 ----------\n";
+var_dump($code);
+echo "------------ 反向路由缓存结束 ----------\n";
 
 #----- 正式程序将这么写 ----------
 //直接读取之前保存的数据

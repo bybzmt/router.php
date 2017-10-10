@@ -204,10 +204,36 @@ class Tool
         } elseif (is_array($var)) {
             /* dump array in plain array.*/
             $array = array ();
+            $hasArray = false;
+
+            $hasArray = false;
+            $allKeyInt = true;
             foreach($var as $k=>$v) {
-                $array[] = str_repeat($this->_indent, $dep+1) . var_export($k, true).' => '. $this->_export($v, $dep+1) . ",\n";
+                if (!is_int($k)) {
+                    $allKeyInt = false;
+                }
+                if (is_array($v) || is_object($v)) {
+                    $hasArray = true;
+                }
             }
-            $result = "array(\n" .  implode($array) .  str_repeat($this->_indent, $dep).")";
+
+            foreach($var as $k=>$v) {
+                if ($allKeyInt) {
+                    $array[] = $this->_export($v, $dep+1);
+                } else {
+                    $array[] = var_export($k, true).' => '. $this->_export($v, $dep+1);
+                }
+            }
+
+            if ($hasArray) {
+                $result = "[\n" .
+                    str_repeat($this->_indent, $dep+1) .
+                        implode(",\n".str_repeat($this->_indent, $dep+1), $array) . ",\n".
+                    str_repeat($this->_indent, $dep) . "]";
+            } else {
+                $result = "[" . implode(",", $array) ."]";
+            }
+
         } else {
             $result = var_export($var, true);
         }
