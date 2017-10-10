@@ -12,7 +12,7 @@ class Tool
     //路由规则
     protected $_routes;
 
-    public function __construct(array $routes=[]) {
+    public function __construct(array $routes=array()) {
         $this->_routes = $routes;
     }
 
@@ -57,7 +57,7 @@ class Tool
                     if (is_array($func) && count($func) == 4) {
                         list(, , , $action) = $func;
 
-                        $map[$action][] = [null, $uri, []];
+                        $map[$action][] = array(null, $uri, array());
                     } else {
                         //忽略掉其它格式的
                     }
@@ -66,7 +66,7 @@ class Tool
                 unset($route['#map#']);
             }
 
-            $this->_convertRegex($map, $route, []);
+            $this->_convertRegex($map, $route, array());
         }
 
         //排下序尽量把要求最严的放在最前面
@@ -123,13 +123,13 @@ class Tool
                             throw new Exception("您注册的路由:'$full_regex' 与映射key数量不符");
                         }
 
-                        $map[$action][] = [$full_regex, $format, $keys];
+                        $map[$action][] = array($full_regex, $format, $keys);
                     } else {
                         //忽略掉其它格式的
                     }
                 }
             } else {
-                $this->_convertRegex($map, $routes, array_merge($stack, [$path]));
+                $this->_convertRegex($map, $routes, array_merge($stack, array($path)));
             }
         }
     }
@@ -226,12 +226,12 @@ class Tool
             }
 
             if ($hasArray) {
-                $result = "[\n" .
+                $result = "array(\n" .
                     str_repeat($this->_indent, $dep+1) .
                         implode(",\n".str_repeat($this->_indent, $dep+1), $array) . ",\n".
-                    str_repeat($this->_indent, $dep) . "]";
+                    str_repeat($this->_indent, $dep) . ")";
             } else {
-                $result = "[" . implode(",", $array) ."]";
+                $result = "array(" . implode(",", $array) .")";
             }
 
         } else {

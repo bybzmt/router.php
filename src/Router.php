@@ -83,7 +83,7 @@ class Router extends Basic
         if (list($func, $params) = $this->match($method, $uri)) {
             $out = $this->dispatch($func, $params);
         } else if ($this->_notFoundFunc) {
-            $out = $this->dispatch($this->_notFoundFunc, []);
+            $out = $this->dispatch($this->_notFoundFunc, array());
         } else {
             $out = $this->default404();
         }
@@ -249,20 +249,20 @@ class Router extends Basic
             $class = str_replace($this->_separator_method, '\\', substr($map, 0, $idx));
             $method = substr($map, $idx+1);
 
-            $keys = [];
+            $keys = array();
 
             while ($key = next($tmp)) {
                 //用于去除可选参数前缀
                 if (strpos($key, $this->_separator_prefix) !== false) {
                     list($prefix, $key) = explode($this->_separator_prefix, $key, 2);
 
-                    $keys[] = [$prefix, $key, true];
+                    $keys[] = array($prefix, $key, true);
                 } else {
-                    $keys[] = ["", $key, false];
+                    $keys[] = array("", $key, false);
                 }
             }
 
-            return [$class, $method, $keys, $map];
+            return array($class, $method, $keys, $map);
         }
 
         return $func;

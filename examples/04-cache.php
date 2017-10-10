@@ -66,7 +66,7 @@ echo "------------ 反向路由缓存结束 ----------\n";
 //直接读取之前保存的数据
 $reverse = new \Bybzmt\Router\Reverse(require $tmpfile);
 
-$uri = $reverse->buildUri('example.test', ['k1'=>'2008', 'k2'=>'09', 'k3'=>'31', 'k4'=>'k4']);
+$uri = $reverse->buildUri('example.test', array('k1'=>'2008', 'k2'=>'09', 'k3'=>'31', 'k4'=>'k4'));
 
 var_dump($uri);
 

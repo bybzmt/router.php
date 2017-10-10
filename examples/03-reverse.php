@@ -33,11 +33,11 @@ $reverse = new \Bybzmt\Router\Reverse($data);
 //这会得到 /a1
 var_dump($reverse->buildUri('example.test'));
 //这会得到 /a2/2008
-var_dump($reverse->buildUri('example.test', ['k1'=>'2008']));
+var_dump($reverse->buildUri('example.test', array('k1'=>'2008')));
 //这会得到 /a3/2008/09
-var_dump($reverse->buildUri('example.test', ['k1'=>'2008', 'k2'=>'09']));
+var_dump($reverse->buildUri('example.test', array('k1'=>'2008', 'k2'=>'09')));
 //这会得到 /a3/2008/09?k3=31
-var_dump($reverse->buildUri('example.test', ['k1'=>'2008', 'k2'=>'09', 'k3'=>'31']));
+var_dump($reverse->buildUri('example.test', array('k1'=>'2008', 'k2'=>'09', 'k3'=>'31')));
 //这会得到/a1?k1=word
-var_dump($reverse->buildUri('example.test', ['k1'=>'word']));
+var_dump($reverse->buildUri('example.test', array('k1'=>'word')));
 

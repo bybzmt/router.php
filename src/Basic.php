@@ -20,7 +20,7 @@ class Basic
      *
      * @param routes 用于载入之前缓存的路由规则
      */
-    public function __construct(array $routes=[])
+    public function __construct(array $routes=array())
     {
         $this->_routes = $routes;
     }
@@ -39,7 +39,7 @@ class Basic
         $routes = isset($this->_routes[$method]) ? $this->_routes[$method] : array();
 
         if (isset($routes['#map#'][$uri])) {
-            return [$routes['#map#'][$uri], []];
+            return array($routes['#map#'][$uri], array());
         }
 
         $i=1;
@@ -61,7 +61,7 @@ class Basic
             foreach ($routes['#regex#'] as $pattern => $func) {
                 if (preg_match($pattern, $tail, $matches,  PREG_OFFSET_CAPTURE)) {
 
-                    $params = [];
+                    $params = array();
                     for ($i=1, $e=count($matches); $i<$e; $i++) {
                         if ($i+1 < $e) {
                             //将多个子组重复捕捉到的部分去除
@@ -73,7 +73,7 @@ class Basic
                         }
                     }
 
-                    return [$func, $params];
+                    return array($func, $params);
                 }
             }
         }

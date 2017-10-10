@@ -16,7 +16,7 @@ class Reverse
      *
      * @param map 用于载入之前缓存的反向路由规则
      */
-    function __construct(array $map=[])
+    function __construct(array $map=array())
     {
         $this->_map = $map;
     }
@@ -29,10 +29,8 @@ class Reverse
      * @param func 目标对像 格式: "类名:类方法"
      * @param params 请求参数
      */
-    function buildUri(string $func, array $params=[])
+    function buildUri(string $func, array $params=array())
     {
-        $func = ltrim($func, '\\');
-
         if (!isset($this->_map[$func])) {
             throw new Exception("mkUrl 映射关系:$func 未定义");
         }
@@ -57,10 +55,10 @@ class Reverse
     {
         //静态映射不需要验证
         if ($route[0] == null) {
-            return [$route[1], $params];
+            return array($route[1], $params);
         }
 
-        $param_arr = [$route[1]];
+        $param_arr = array($route[1]);
 
         foreach ($route[2] as $tmp) {
             list($prefix, $key, $optional) = $tmp;
@@ -86,7 +84,7 @@ class Reverse
 
         //验证是否符合正则要求
         if (preg_match($route[0], $uri)) {
-            return [$uri, $params];
+            return array($uri, $params);
         }
 
         return null;
