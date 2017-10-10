@@ -63,13 +63,13 @@ class Reverse
         $param_arr = [$route[1]];
 
         foreach ($route[2] as $tmp) {
-            list($must, $prefix, $key) = $tmp;
+            list($prefix, $key, $optional) = $tmp;
 
             if (isset($params[$key])) {
                 $param_arr[] = $prefix . $params[$key];
                 unset($params[$key]);
             } else {
-                if (!$must) {
+                if ($optional) {
                     $param_arr[] = "";
                 } else {
                     //当只一条时 严格验证参数

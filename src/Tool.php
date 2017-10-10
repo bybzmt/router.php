@@ -6,20 +6,8 @@ namespace Bybzmt\Router;
  */
 class Tool
 {
-    //匹配时正则开头
-    protected $_regex_left = '#^';
-
-    //匹配时正则结尾
-    protected $_regex_right = '$#';
-
     //导出代码时排版缩进
     protected $_indent = '    ';
-
-    //回调函数分隔符
-    protected $_func_separator = ':';
-
-    //key映射前缀分隔符
-    protected $_key_prefix_separator = ' ';
 
     //路由规则
     protected $_routes;
@@ -66,9 +54,8 @@ class Tool
         foreach ($this->_routes as $route) {
             if (isset($route['#map#'])) {
                 foreach ($route['#map#'] as $uri => $func) {
-                    if (is_string($func) && $func[0] === $this->_func_separator) {
-                        list(, $p1, $p2) = explode($this->_func_separator, $func);
-                        $action = ltrim($p1, '\\') . $this->_func_separator . $p2;
+                    if (is_array($func) && count($func) == 4) {
+                        list(, , , $action) = $func;
 
                         $map[$action][] = [null, $uri, []];
                     } else {
@@ -118,55 +105,41 @@ class Tool
     //转换正则规则的路由
     protected function _convertRegex(array &$map, array $root, array $stack)
     {
-        foreach ($root as $key => $routes) {
-            if ($key == '#regex#') {
-                foreach ($routes as $regex => $hold) {
-                    if (is_string($hold) && $hold[0] === $this->_func_separator) {
+        foreach ($root as $path => $routes) {
+            if ($path == '#regex#') {
+                foreach ($routes as $regex => $func) {
+                    if (is_array($func) && count($func) == 4) {
+                        list(, , $keys, $action) = $func;
                         $sub_num = 0;
 
-                        //解析出sprintf函数格式
+                        //解析出sprintf函数格式 把: "#^/abc/(\d+)$#i" 变成 "/abc/%s"
                         $format = '/'.implode('/', $stack) . $this->_parseRegex($regex, $sub_num);
 
-                        //拆解hold字符串
-                        $tmp = explode($this->_func_separator, $hold);
-
-                        //找出可选参数
-                        $tips = [];
-                        for ($i=3, $m=count($tmp); $i<$m; $i++) {
-                            if (strpos($tmp[$i], $this->_key_prefix_separator) != false) {
-                                list($prefix, $kname) = explode($this->_key_prefix_separator, $tmp[$i], 2);
-                                $tips[] = [false, $prefix, $kname];
-                            } else {
-                                $tips[] = [true, "", $tmp[$i]];
-                            }
-                        }
-
-                        $full_regex = '/'.implode('/', $stack) . $regex;
+                        //把: "#^/abc/(\d+)$#i" 变成 "#^/def/abc/(\d+)$#i"
+                        $full_regex = substr($regex, 0, 2) . '/'.implode('/', $stack) . substr($regex, 2);
 
                         //验证参数量
-                        if (count($tmp) < 4 || (count($tmp)-3) != $sub_num) {
-                            throw new Exception("您注册的路由:'$full_regex' 与回调:'$hold' 不相符");
+                        if (count($keys) != $sub_num) {
+                            throw new Exception("您注册的路由:'$full_regex' 与映射key数量不符");
                         }
 
-                        //回调函数名
-                        $func = ltrim($tmp[1], '\\') . $this->_func_separator . $tmp[2];
-
-                        $full_regex = $this->_regex_left . $full_regex . $this->_regex_right;
-
-                        $map[$func][] = [$full_regex, $format, $tips];
+                        $map[$action][] = [$full_regex, $format, $keys];
                     } else {
                         //忽略掉其它格式的
                     }
                 }
             } else {
-                $this->_convertRegex($map, $routes, array_merge($stack, [$key]));
+                $this->_convertRegex($map, $routes, array_merge($stack, [$path]));
             }
         }
     }
 
     //转换正则规则到sprintf规则
-    protected function _parseRegex($regex, &$sub_num)
+    protected function _parseRegex($full_regex, &$sub_num)
     {
+        //去掉正则的分隔符 如: "#^/abc/(\d+)$#i" 得到: "/abc/(\d+)"
+        $regex = substr($full_regex, 2, strrpos($full_regex, '$')-2);
+
         $suffix = "";
         $sub = 0;
 

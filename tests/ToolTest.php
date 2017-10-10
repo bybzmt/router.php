@@ -10,10 +10,10 @@ class ToolTest extends PHPUnit_Framework_TestCase
 
         $router->get('/aa', function(){ echo "aa\n"; });
         $router->get('/bb', function(){ echo "aa\n"; });
-        $router->get('/dd/aa', ':example:test');
-        $router->get('/dd/aa(/\d{4}(/\d{2}(/\d{2})?)?)?', ':example:test:/ k1:/ k2:/ k3');
-        $router->get('/dd/aa/(\d+)', ':example:test:k1');
-        $router->get('/dd/(\d+)', ':example:test:k1');
+        $router->get('/dd/aa', ':example.test');
+        $router->get('/dd/aa(/\d{4}(/\d{2}(/\d{2})?)?)?', ':example.test:/ k1:/ k2:/ k3');
+        $router->get('/dd/aa/(\d+)', ':example.test:k1');
+        $router->get('/dd/(\d+)', ':example.test:k1');
         $router->get('/dd/aa/bb/(\d+)/(\d+)', function($start=0, $end=0){
             echo "------------ 路由执行开始 ----------\n";
             for ($i=$start; $i<$end; $i++) {
@@ -62,19 +62,19 @@ class ToolTest extends PHPUnit_Framework_TestCase
 
         $reverse = new \Bybzmt\Router\Reverse(require $this->_tmpfile);
 
-        $uri = $reverse->buildUri('example:test', ['k1'=>'2008', 'k2'=>'09', 'k3'=>'31', 'k4'=>'k4']);
+        $uri = $reverse->buildUri('example.test', ['k1'=>'2008', 'k2'=>'09', 'k3'=>'31', 'k4'=>'k4']);
 
         $this->assertEquals($uri, '/dd/aa/2008/09/31?k4=k4');
     }
 
     /**
      * @expectedException Bybzmt\Router\Exception
-     * @expectedExceptionMessage 与回调:':example:test:k1' 不相符
+     * @expectedExceptionMessage 与映射key数量不符
      */
     public function testConvertReverseKeyNum()
     {
         $router = new \Bybzmt\Router\Router();
-        $router->get('/a3/(\d+)/(\d+)', ':example:test:k1');
+        $router->get('/a3/(\d+)/(\d+)', ':example.test:k1');
 
         $tool = new \Bybzmt\Router\Tool($router->getRoutes());
         $data = $tool->convertReverse();
@@ -82,12 +82,12 @@ class ToolTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Bybzmt\Router\Exception
-     * @expectedExceptionMessage 与回调:':example:test' 不相符
+     * @expectedExceptionMessage 与映射key数量不符
      */
     public function testConvertReverseNoKey()
     {
         $router = new \Bybzmt\Router\Router();
-        $router->get('/a3/(\d+)/(\d+)', ':example:test');
+        $router->get('/a3/(\d+)/(\d+)', ':example.test');
 
         $tool = new \Bybzmt\Router\Tool($router->getRoutes());
         $data = $tool->convertReverse();
@@ -95,7 +95,7 @@ class ToolTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Bybzmt\Router\Exception
-     * @expectedExceptionMessage 与回调:':example' 不相符
+     * @expectedExceptionMessage 与映射key数量不符
      */
     public function testConvertReverseBadFunc()
     {

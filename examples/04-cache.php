@@ -13,10 +13,10 @@ $router = new \Bybzmt\Router\Router();
 // ----- 这里只是演示下-------
 $router->get('/aa', function(){ echo "aa\n"; });
 $router->get('/bb', function(){ echo "aa\n"; });
-$router->get('/dd/aa', ':example:test');
-$router->get('/dd/aa(/\d{4}(/\d{2}(/\d{2})?)?)?', ':example:test:/ k1:/ k2:/ k3');
-$router->get('/dd/aa/(\d+)', ':example:test:k1');
-$router->get('/dd/(\d+)', ':example:test:k1');
+$router->get('/dd/aa', ':example.test');
+$router->get('/dd/aa(/\d{4}(/\d{2}(/\d{2})?)?)?', ':example.test:/ k1:/ k2:/ k3');
+$router->get('/dd/aa/(\d+)', ':example.test:k1');
+$router->get('/dd/(\d+)', ':example.test:k1');
 $router->get('/dd/aa/bb/(\d+)/(\d+)', function($start=0, $end=0){
     echo "------------ 路由执行开始 ----------\n";
     for ($i=$start; $i<$end; $i++) {
@@ -62,7 +62,7 @@ file_put_contents($tmpfile, $code);
 //直接读取之前保存的数据
 $reverse = new \Bybzmt\Router\Reverse(require $tmpfile);
 
-$uri = $reverse->buildUri('example:test', ['k1'=>'2008', 'k2'=>'09', 'k3'=>'31', 'k4'=>'k4']);
+$uri = $reverse->buildUri('example.test', ['k1'=>'2008', 'k2'=>'09', 'k3'=>'31', 'k4'=>'k4']);
 
 var_dump($uri);
 

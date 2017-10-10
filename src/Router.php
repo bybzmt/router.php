@@ -8,10 +8,13 @@ class Router extends Basic
 {
 
     //回调函数分隔符
-    protected $_func_separator = ':';
+    protected $_separator_func = ':';
 
     //key映射前缀分隔符
-    protected $_key_prefix_separator = ' ';
+    protected $_separator_prefix = ' ';
+
+    //class/method分隔符
+    protected $_separator_method = '.';
 
     //请求方法 如:GET
     private $_method;
@@ -208,6 +211,18 @@ class Router extends Basic
     }
 
     /**
+     * 注册路由规则
+     *
+     * @param methods 请求方法，多个方法以|分隔，如："GET|POST|PUT"
+     * @param pattern 匹配规则，可以使用PCRE正则
+     * @param func    注册的回调，路由匹配成功时它将原样返回
+     */
+    public function handle(string $methods, string $pattern, $func)
+    {
+        return parent::handle($methods, $pattern, $this->parseFunc($func));
+    }
+
+    /**
      * 默认404页面
      */
     protected function default404()
@@ -221,29 +236,53 @@ class Router extends Basic
     }
 
     /**
+     * 解析回调格式
+     */
+    protected function parseFunc($func)
+    {
+        if (is_string($func) && $func[0] === $this->_separator_func) {
+            $tmp = explode($this->_separator_func, $func);
+
+            $map = next($tmp);
+
+            $idx = strrpos($map, $this->_separator_method);
+            $class = str_replace($this->_separator_method, '\\', substr($map, 0, $idx));
+            $method = substr($map, $idx+1);
+
+            $keys = [];
+
+            while ($key = next($tmp)) {
+                //用于去除可选参数前缀
+                if (strpos($key, $this->_separator_prefix) !== false) {
+                    list($prefix, $key) = explode($this->_separator_prefix, $key, 2);
+
+                    $keys[] = [$prefix, $key, true];
+                } else {
+                    $keys[] = ["", $key, false];
+                }
+            }
+
+            return [$class, $method, $keys, $map];
+        }
+
+        return $func;
+    }
+
+    /**
      * 默认分发方法
      */
     protected function dispatch($func, array $params)
     {
-        if (is_string($func) && $func[0] === $this->_func_separator) {
-            $keys = explode($this->_func_separator, $func);
+        if (is_array($func) && count($func) == 4) {
+            list($class, $method, $keys, $map) = $func;
 
-            if (count($keys) < 3) {
-                throw new Exception("Dispatch '$func' Format Error");
-            }
-
-            list(, $class, $method) = $keys;
-
-            $class = '\\'.ltrim($class, '\\');
-
+            //映射参数到$_GET中去
             foreach ($params as $i => $param) {
-                if (isset($keys[$i+3])) {
-                    $key = $keys[$i+3];
+                if (isset($keys[$i])) {
+                    list($prefix, $key) = $keys[$i];
 
-                    //key可以为"prefix keyname"的形式
-                    //这里要把prefix给去除掉
-                    if (strpos($key, $this->_key_prefix_separator) !== false) {
-                        list($prefix, $key) = explode($this->_key_prefix_separator, $key, 2);
+                    if ($prefix) {
+                        //去除可选参数前缀
                         $_GET[$key] = substr($param, strlen($prefix));
                     } else {
                         $_GET[$key] = $param;
@@ -252,13 +291,13 @@ class Router extends Basic
             }
 
             if (!class_exists($class)) {
-                throw new Exception("Dispatch '$func' Class Not Exists");
+                throw new Exception("Dispatch '$map' Class Not Exists");
             }
 
             $obj = new $class();
 
             if (!method_exists($obj, $method)) {
-                throw new Exception("Dispatch '$func' Method Not Exists");
+                throw new Exception("Dispatch '$map' Method Not Exists");
             }
 
             return $obj->$method();

@@ -7,58 +7,40 @@ require __DIR__ . '/loader.php';
 $_SERVER['REQUEST_METHOD'] = 'GET';
 $_SERVER['REQUEST_URI'] = '/callback/a1/b2';
 
+
+
 /**
- * 自定义路由分发
+ * 自定义路由分发 - 修改注册的格式
  */
 class MyRouter extends \Bybzmt\Router\Router
 {
-    //修改正则改为大小写不敏感  (记得这边改完反向路由那边也得改)
+    //修改正则改为大小写不敏感
     protected $_regex_left = '#^';
     protected $_regex_right = '$#i';
 
     /**
-     * 路由分发执行
+     * 解析注册的回调
      *
-     * @param func 之注册路由时设置的，它可以是任意值，并且会原样传到这个参数上
-     * @param params 是路由捕获到的参数，没有时为空数组
+     * 反回格式: [$class, $method, $keys, $map]
+     *
+     * $map 是路由的key名(反向路由用)
+     *
+     * $keys 是参数映射的key 格式为: [][$prefix, $key, $optional]
      */
-    protected function dispatch($func, array $params)
+    protected function parseFunc($func)
     {
-        //可以取到原始数据
-        $method = $this->getMethod();
-        $baseuri = $this->getBasePath();
-        $uri = $this->getUri();
+        $class = 'Example';
+        $method = 'test';
 
-        echo "这里就是示例一下，可以任意修改～\n";
-        var_dump($func, $params);
-    }
-
-    /*
-     * 这是一种典型的修改
-     *
-     * 由于func的类需要有完整命名空间，所以看上去很长很累赘
-     * 但是由于路由库不能确定func在特定项目什么样更好，这里
-     * 提供一种自定义的func映射方的方式
-     *
-     * 在这里示例: 自动给class增加前缀和method增加后缀
-     *
-     * (函数应该叫: dispatch 这里只是为了方便作例子改了个名)
-     */
-    protected function dispatch2($func, array $params)
-    {
-        //快速判断func格式类型
-        //不过一般特定项目只会使用一种形式，这个判可以忽略
-        //if (is_string($func) && $func[0] == $this->_func_separator)
-
-        $tmp = explode($this->_func_separator, $func, 4);
-
-        //func格式规定最短为:class:method所以tmp[2]一定存在
-        $tmp[1] = 'Bybymt\\Blog\\Web\\' . $tmp[1];
-        $tmp[2] = $tmp[2].'Action';
-
-        $newFunc = implode($this->_func_separator, $tmp);
-
-        return parent::dispatch($newFunc, $params);
+        return array(
+            $class,
+            $method,
+            array(
+                array('', 'key1', true),
+                array('', 'key2', false),
+            ),
+            $class . '.'. $method
+        );
     }
 
     /*
@@ -73,14 +55,30 @@ class MyRouter extends \Bybzmt\Router\Router
 
 //------------------------
 
+//一个更简单的修改方法
+class MyRouter2 extends \Bybzmt\Router\Router
+{
+
+    //一个更简单的修改方法
+    protected function parseFunc($func)
+    {
+        $data = parent::parseFunc($func);
+
+        //可以这里修改class/method
+        $data[0] = 'Bybymt\\Blog\\Web\\Controller\\' . $data[0];
+        $data[1] = $data[1].'Action';
+
+        return $data;
+    }
+}
+
+//----------------------
 $router = new MyRouter();
 
 /*
  * 自定义的路由分发 MyRouter
  */
-$router->get('/callback/(\w+)/(\w+)', ':example:test:k1:k2');
+$router->get('/callback/(\w+)/(\w+)', ':example.test:k1:k2');
 
 //执行路由动作
 $router->run();
-
-

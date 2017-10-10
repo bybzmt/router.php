@@ -8,7 +8,7 @@ Features
 * Dynamic Route Patterns
 * Supports `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`, `PATCH` and `HEAD` request methods
 * Supports `X-HTTP-Method-Override` header
-* Allowance of `:Class:Method` calls
+* Allowance of `:Class.Method` calls
 * Custom 404 handling
 * Reverse Router
 
@@ -48,7 +48,7 @@ using $router->handle(method(s), pattern, function):
 ```php
 $router->handle('GET|POST', 'pattern', function() { … });
 //or
-$router->handle('GET|POST', 'pattern', ':Class:Method');
+$router->handle('GET|POST', 'pattern', ':Class.Method');
 ```
 
 Shorthands for single request methods are provided:
@@ -81,11 +81,11 @@ $router->get('/hello/(\w+)', function($name) {
 });
 ```
 
-:Class:Method calls
+:Class.Method calls
 ----------------------------
 We can route to the class action like so:
 ```php
-$router->get('/(\d+)', ':User:showProfile:id');
+$router->get('/(\d+)', ':User.showProfile:id');
 ```
 
 Custom 404
@@ -102,7 +102,7 @@ Reverse Router
 ---------------------------
 ```php
 $router = new \Bybzmt\Router\Router();
-$router->get('/news/(\d+)', ':news:show:id');
+$router->get('/news/(\d+)', ':news.show:id');
 
 $tool = new \Bybzmt\Router\Tool($router->getRoutes());
 $data = $tool->convertReverse();
@@ -110,7 +110,7 @@ $data = $tool->convertReverse();
 $reverse = new \Bybzmt\Router\Reverse($data);
 
 //echo /news/1234
-echo $reverse->buildUri('news:show', ['id'=>1234]);
+echo $reverse->buildUri('news.show', ['id'=>1234]);
 ```
 
 Cache Data
@@ -118,9 +118,9 @@ Cache Data
 Storage Data (file1.php)
 ```php
 $router = new \Bybzmt\Router\Router();
-$router->get('/a1', ':example:test');
-$router->get('/a2/(\d+)', ':example:test:k1');
-$router->get('/a3/(\d+)/(\d+)', ':example:test:k1:k2');
+$router->get('/a1', ':example.test');
+$router->get('/a2/(\d+)', ':example.test:k1');
+$router->get('/a3/(\d+)/(\d+)', ':example.test:k1:k2');
 
 $tool = new \Bybzmt\Router\Tool($router->getRoutes());
 

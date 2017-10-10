@@ -59,7 +59,7 @@ class Basic
 
         if (isset($routes['#regex#'])) {
             foreach ($routes['#regex#'] as $pattern => $func) {
-                if (preg_match($this->_regex_left . $pattern . $this->_regex_right, $tail, $matches,  PREG_OFFSET_CAPTURE)) {
+                if (preg_match($pattern, $tail, $matches,  PREG_OFFSET_CAPTURE)) {
 
                     $params = [];
                     for ($i=1, $e=count($matches); $i<$e; $i++) {
@@ -94,15 +94,19 @@ class Basic
 
         $regex_meta_character = '[](){}*+?\\';
 
-        //判断是否是正则
+        //判断是否是正则 如: "/abc/(\d+)" sub为: "(\d+)"
         $sub = strpbrk($pattern, $regex_meta_character);
         if ($sub === false) {
             foreach (explode('|', $methods) as $method) {
                 $this->_routes[$method]['#map#'][$pattern] = $func;
             }
         } else {
+            //从: "/abc/(\d+)" 拿到: "/(\d+)"
             $regex = strrchr(substr($pattern, 0, strlen($pattern) - strlen($sub)), '/') . $sub;
+            //从: "/abc/(\d+)" 拿到: "/abc"
             $prefix = substr($pattern, 0, strlen($pattern) - strlen($regex));
+            //转为完整的正则 如: "#/(\d+)#i"
+            $full_regex = $this->_regex_left . $regex . $this->_regex_right;
 
             foreach (explode('|', $methods) as $method) {
                 $routes = &$this->_routes;
@@ -111,7 +115,7 @@ class Basic
                     $routes = &$routes[$part];
                 }
 
-                $routes['#regex#'][$regex] = $func;
+                $routes['#regex#'][$full_regex] = $func;
             }
         }
     }
