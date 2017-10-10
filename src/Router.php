@@ -291,13 +291,13 @@ class Router extends Basic
             }
 
             if (!class_exists($class)) {
-                throw new Exception("Dispatch '$map' Class Not Exists");
+                throw new Exception("Dispatch '$map' Class:'$class' Not Exists");
             }
 
             $obj = new $class();
 
             if (!method_exists($obj, $method)) {
-                throw new Exception("Dispatch '$map' Method Not Exists");
+                throw new Exception("Dispatch '$map' Method:'$class::$method' Not Exists");
             }
 
             return $obj->$method();
