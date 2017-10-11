@@ -6,13 +6,10 @@ namespace Bybzmt\Router;
  */
 class Router extends Basic
 {
-
     //回调函数分隔符
     protected $_separator_func = ':';
-
     //key映射前缀分隔符
     protected $_separator_prefix = ' ';
-
     //class/method分隔符
     protected $_separator_method = '.';
 
@@ -236,39 +233,6 @@ class Router extends Basic
     }
 
     /**
-     * 解析回调格式
-     */
-    protected function parseFunc($func)
-    {
-        if (is_string($func) && $func[0] === $this->_separator_func) {
-            $tmp = explode($this->_separator_func, $func);
-
-            $map = next($tmp);
-
-            $idx = strrpos($map, $this->_separator_method);
-            $class = str_replace($this->_separator_method, '\\', substr($map, 0, $idx));
-            $method = substr($map, $idx+1);
-
-            $keys = array();
-
-            while ($key = next($tmp)) {
-                //用于去除可选参数前缀
-                if (strpos($key, $this->_separator_prefix) !== false) {
-                    list($prefix, $key) = explode($this->_separator_prefix, $key, 2);
-
-                    $keys[] = array($prefix, $key, true);
-                } else {
-                    $keys[] = array("", $key, false);
-                }
-            }
-
-            return array($class, $method, $keys, $map);
-        }
-
-        return $func;
-    }
-
-    /**
      * 默认分发方法
      */
     protected function dispatch($func, array $params)
@@ -308,5 +272,52 @@ class Router extends Basic
         }
 
         throw new Exception("Dispatch Callback Is Not Callable!");
+    }
+
+    /**
+     * 解析回调格式
+     */
+    protected function parseFunc($func)
+    {
+        if (is_string($func) && $func[0] === $this->_separator_func) {
+            $tmp = explode($this->_separator_func, $func);
+
+            $map = next($tmp);
+
+            list($class, $method) = $this->parseClass($map);
+
+            $keys = array();
+
+            while ($key = next($tmp)) {
+                //用于去除可选参数前缀
+                if (strpos($key, $this->_separator_prefix) !== false) {
+                    list($prefix, $key) = explode($this->_separator_prefix, $key, 2);
+
+                    $keys[] = array($prefix, $key, true);
+                } else {
+                    $keys[] = array("", $key, false);
+                }
+            }
+
+            return array($class, $method, $keys, $map);
+        }
+
+        return $func;
+    }
+
+    /**
+     * 解析类名.方法名映射
+     */
+    protected function parseClass($map)
+    {
+        $idx = strrpos($map, $this->_separator_method);
+        if ($idx === false) {
+            throw new Exception("Parse class.method: $map Error");
+        }
+
+        $class = str_replace($this->_separator_method, '\\', substr($map, 0, $idx));
+        $method = substr($map, $idx+1);
+
+        return array($class, $method);
     }
 }

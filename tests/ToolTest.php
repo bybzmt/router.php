@@ -100,7 +100,7 @@ class ToolTest extends PHPUnit_Framework_TestCase
     public function testConvertReverseBadFunc()
     {
         $router = new \Bybzmt\Router\Router();
-        $router->get('/a3/(\d+)/(\d+)', ':example');
+        $router->get('/a3/(\d+)/(\d+)', ':example.test');
 
         $tool = new \Bybzmt\Router\Tool($router->getRoutes());
         $data = $tool->convertReverse();
