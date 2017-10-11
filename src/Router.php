@@ -216,7 +216,7 @@ class Router extends Basic
      */
     public function handle(string $methods, string $pattern, $func)
     {
-        return parent::handle($methods, $pattern, $this->parseFunc($func));
+        return parent::handle($methods, $pattern, $this->_parseFunc($func));
     }
 
     /**
@@ -241,20 +241,9 @@ class Router extends Basic
             list($class, $method, $keys, $map) = $func;
 
             //映射参数到$_GET中去
-            foreach ($params as $i => $param) {
-                if (isset($keys[$i])) {
-                    list($prefix, $key) = $keys[$i];
+            $this->_mapGET($params, $keys);
 
-                    if ($prefix) {
-                        //去除可选参数前缀
-                        $_GET[$key] = substr($param, strlen($prefix));
-                    } else {
-                        $_GET[$key] = $param;
-                    }
-                }
-            }
-
-            if (!class_exists($class)) {
+            if (!$this->_loadClass($class)) {
                 throw new Exception("Dispatch '$map' Class:'$class' Not Exists");
             }
 
@@ -275,16 +264,36 @@ class Router extends Basic
     }
 
     /**
+     * 映射参数到$_GET中去
+     */
+    protected function _mapGET(array $params, array $keys)
+    {
+        //映射参数到$_GET中去
+        foreach ($params as $i => $param) {
+            if (isset($keys[$i])) {
+                list($prefix, $key) = $keys[$i];
+
+                if ($prefix) {
+                    //去除可选参数前缀
+                    $_GET[$key] = substr($param, strlen($prefix));
+                } else {
+                    $_GET[$key] = $param;
+                }
+            }
+        }
+    }
+
+    /**
      * 解析回调格式
      */
-    protected function parseFunc($func)
+    protected function _parseFunc($func)
     {
         if (is_string($func) && $func[0] === $this->_separator_func) {
             $tmp = explode($this->_separator_func, $func);
 
             $map = next($tmp);
 
-            list($class, $method) = $this->parseClass($map);
+            list($class, $method) = $this->_parseClass($map);
 
             $keys = array();
 
@@ -308,7 +317,7 @@ class Router extends Basic
     /**
      * 解析类名.方法名映射
      */
-    protected function parseClass($map)
+    protected function _parseClass($map)
     {
         $idx = strrpos($map, $this->_separator_method);
         if ($idx === false) {
@@ -319,5 +328,13 @@ class Router extends Basic
         $method = substr($map, $idx+1);
 
         return array($class, $method);
+    }
+
+    /**
+     * 加载控制器类
+     */
+    protected function _loadClass($class)
+    {
+        return class_exists($class);
     }
 }
