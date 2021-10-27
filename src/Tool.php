@@ -79,7 +79,7 @@ class Tool
                     $b = strlen($bb[0]);
                 }
 
-                return ($a==$b) ? 0 : ($a<$b) ? 1 : -1;
+                return ($a==$b) ? 0 : (($a<$b) ? 1 : -1);
             });
 
             //去掉重复的规则
