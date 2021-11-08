@@ -11,14 +11,17 @@ class Reverse
     //反向路由数据
     protected $_map;
 
+    protected $_basePath;
+
     /**
      * 初始化反向路由
      *
      * @param map 用于载入之前缓存的反向路由规则
      */
-    function __construct(array $map=array())
+    function __construct(array $map=array(), $basePath=null)
     {
         $this->_map = $map;
+        $this->_basePath = $basePath;
     }
 
     /**
@@ -29,7 +32,7 @@ class Reverse
      * @param func 目标对像 格式: "类名:类方法"
      * @param params 请求参数
      */
-    function buildUri(string $func, array $params=array())
+    public function buildUri(string $func, array $params=array())
     {
         if (!isset($this->_map[$func])) {
             throw new Exception("mkUrl 映射关系:$func 未定义");
@@ -44,7 +47,7 @@ class Reverse
                 if ($params_new) {
                     $uri .= '?' . http_build_query($params_new);
                 }
-                return $uri;
+                return $this->_basePath . $uri;
             }
         }
 
