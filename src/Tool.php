@@ -75,8 +75,8 @@ class Tool
                 $a = count($aa[2]);
                 $b = count($bb[2]);
                 if ($a==$b) {
-                    $a = strlen($aa[0]);
-                    $b = strlen($bb[0]);
+                    $a = strlen((string)$aa[0]);
+                    $b = strlen((string)$bb[0]);
                 }
 
                 return ($a==$b) ? 0 : (($a<$b) ? 1 : -1);
