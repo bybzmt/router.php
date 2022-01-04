@@ -17,7 +17,7 @@ class Router extends Basic
     private $_method;
 
     //请求base路径
-    private $_basePath;
+    private string $_basePath = "";
 
     //请求地址
     private $_uri;
